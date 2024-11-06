@@ -1,60 +1,62 @@
-pipeline Neuss_Tree_Pipeline {
+pipeline Voge_lsang_TreePipeline {
 
-    block Data_Extractor oftype HttpExtractor {
-        url: "https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv";
+    //pipeline stages
+    Tree_Data_Fetcher 
+        -> Text_Interpreter
+        -> Csv_Data_Processor
+        -> Data_Table_Processor
+        -> Database_Saver;
+
+    // Fetch CSV Data from URL
+    block Tree_Data_Fetcher oftype HttpExtractor {
+        url: 'https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv';
     }
 
-    block TextFileInterpreter oftype TextFileInterpreter { }
+    //Interpret as Text
+    block Text_Interpreter oftype TextFileInterpreter { }
 
-    block CSV_Parser oftype CSVInterpreter {
+    // Process CSV with semicolon delimiter
+    block Csv_Data_Processor oftype CSVInterpreter {
         delimiter: ';';
     }
 
-    block Column_Remover oftype ColumnDeleter {
-        delete: [column E];
-    }
-
-    valuetype Valid_Geo_Pattern oftype text {
-        constraints: [
-            Geo_Pattern_Constraint
-        ];
-    }
-
-    constraint Geo_Pattern_Constraint oftype RegexConstraint {
-        regex: /^\d{1,3}\.\d+, \d{1,3}\.\d+$/;
-    }
-
-    valuetype Furth_Stadtteil oftype text {
-        constraints: [
-            Furth_Constraint
-        ];
-    }
-
-    constraint Furth_Constraint oftype RegexConstraint {
-        regex: /^Furth-.*/;
-    }
-
-    block Data_Interpreter oftype TableInterpreter {
+    // Define Required Columns and Data Types (Excluding "baumart_deutsch")
+    block Data_Table_Processor oftype TableInterpreter {
         header: true;
         columns: [
-            "lfd_nr" oftype integer,
-            "stadtteil" oftype Furth_Stadtteil,
-            "standort" oftype text,
-            "baumart_botanisch" oftype text,
-            "baumart_deutsch" oftype text,
-            "id" oftype Valid_Geo_Pattern,            
-            "baumfamilie" oftype text
+            'lfd_nr' oftype integer,
+            'stadtteil' oftype VogelsangRestrictedType,
+            'standort' oftype text,
+            'baumart_botanisch' oftype text,
+            'id' oftype GeoRestrictedType,
+            'baumfamilie' oftype text
         ];
     }
 
-    block Data_Loader oftype SQLiteLoader {
-        table: "trees";
-        file: "trees.sqlite";
+    // Save to SQLite Database
+    block Database_Saver oftype SQLiteLoader {
+        table: 'trees';
+        file: './trees.sqlite';
     }
 
-    Data_Extractor -> TextFileInterpreter
-                   -> CSV_Parser
-                   -> Column_Remover
-                   -> Data_Interpreter
-                   -> Data_Loader;
+    // Define Constraints for Allowed Values
+    constraint VogelsangNamePattern oftype RegexConstraint {
+        regex: /^Vogelsang/;
+    }
+
+    valuetype VogelsangRestrictedType oftype text {
+        constraints: [
+            VogelsangNamePattern
+        ];
+    }
+
+    constraint GeoPattern oftype RegexConstraint {
+        regex: /([0-9]{1,3}\.[0-9]+),\s([0-9]{1,3}\.[0-9]+)/;
+    }
+
+    valuetype GeoRestrictedType oftype text {
+        constraints: [
+            GeoPattern
+        ];
+    }
 }
