@@ -1,24 +1,13 @@
 pipeline Voge_lsang_TreePipeline {
 
-    //pipeline stages
-    Tree_Data_Fetcher 
-        -> Text_Interpreter
-        -> Csv_Data_Processor
-        -> Data_Table_Processor
-        -> Database_Saver;
+   
 
     // Fetch CSV Data from URL
     block Tree_Data_Fetcher oftype HttpExtractor {
         url: 'https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv';
     }
 
-    //Interpret as Text
-    block Text_Interpreter oftype TextFileInterpreter { }
 
-    // Process CSV with semicolon delimiter
-    block Csv_Data_Processor oftype CSVInterpreter {
-        delimiter: ';';
-    }
 
     // Define Required Columns and Data Types (Excluding "baumart_deutsch")
     block Data_Table_Processor oftype TableInterpreter {
@@ -58,5 +47,17 @@ pipeline Voge_lsang_TreePipeline {
         constraints: [
             GeoPattern
         ];
+    }
+  //pipeline stages
+    Tree_Data_Fetcher 
+        -> Text_Interpreter
+        -> Csv_Data_Processor
+        -> Data_Table_Processor
+        -> Database_Saver;
+  //Interpret as Text
+    block Text_Interpreter oftype TextFileInterpreter { }
+ // Process CSV with semicolon delimiter
+    block Csv_Data_Processor oftype CSVInterpreter {
+        delimiter: ';';
     }
 }
