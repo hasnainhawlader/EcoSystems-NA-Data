@@ -1,20 +1,21 @@
 # Project Plan
 ## Title
-North American Air Quality and Pollution Analysis
+Impact of COVID-19 on Diabetes-Related Mortality in the USA
 ## Main Question
-1.	How does pollution correlate with rain reduction in North American urban areas???
+1.	Did the rate of diabetes-related deaths increase in the USA after the onset of COVID-19?
 ## Description
-Air quality is a critical issue as it affects both environmental and human health. This project analyzes air quality metrics from New York City, focusing on pollution levels and their potential correlation with rain patterns. Using statistical and machine learning methods, the analysis aims to uncover insights into how pollution impacts rainfall, which could have implications for urban environmental policies and climate resilience strategies.
-## Datasources
-Json link: 
-https://data.cityofnewyork.us/api/views/c3uy-2p5r/rows.json?accessType=DOWNLOAD <br/>
-Download link: https://data.cityofnewyork.us/api/views/c3uy-2p5r/rows.csv?accessType=DOWNLOAD<br/>
+Diabetes is a chronic health condition that has been a significant contributor to mortality in the USA. With the advent of COVID-19, it is important to examine how the pandemic may have exacerbated the risks associated with diabetes, potentially leading to increased mortality rates. This project analyzes mortality data before and after COVID-19 to assess any changes in diabetes-related death rates, using data from the CDC. The results can give insights into the healthcare needs of diabetic patients and guide policy for post-pandemic health planning.
+## Datasource1
+Download link:  https://data.cdc.gov/api/views/9dzk-mvmi/rows.csv?accessType=DOWNLOAD <br/>
 Data Type: csv
+## Datasource2
+Download link: https://data.cdc.gov/api/views/bxq8-mugm/rows.csv?accessType=DOWNLOAD <br/>
+Data Type: csv
+
 Short description of the DataSource:<br/>
-This dataset provides air quality measurements for New York City, including various pollutants and environmental factors. It contains data points that can be analyzed for pollution trends and correlations with weather patterns.
+That dataset contains information on all-cause mortality by different causes, including diabetes, across the USA. It provides a comprehensive view of mortality rates, which can help analyze trends in diabetes-related deaths.
 ## Work Packages
-Dataset Exploration and Cleaning <br/>
-Data Processing and Normalization <br/>
-Data Analysis and Visualization  <br/>
-Report and Documentation  <br/>
+Data Preprocessing: Clean and preprocess both datasets to ensure consistency and handle any missing values.<br/>
+Feature Combination: Extract and combine relevant features from both datasets to create a unified dataset focused on diabetes-related mortality before and after COVID-19.<br/>
+Visualization: Use data visualization techniques to compare diabetes-related mortality trends before and after the pandemic, highlighting any significant differences.<br/>
 
