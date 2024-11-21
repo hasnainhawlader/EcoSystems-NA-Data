@@ -1,0 +1,129 @@
+pipeline CountryStatsPipeline {
+
+  block DataFetcher oftype HttpExtractor {
+    url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
+  }
+DataFetcher
+    -> Excel_Interpreter
+    -> Bond_Issuance_Sheet_Selector
+    -> BondIssuance_Country_CodeWriter
+    -> Bond_Issuance_Value_Writer
+    -> Bond_Issuance_Range_Selector
+    -> Bond_Issuance_TableInterpreter
+    -> Bond_Data_Loader;
+
+  Excel_Interpreter
+    -> GDP_Per_Capita_Sheet_Selector
+    -> GDP_Per_Capita_Country_Code_Writer
+    -> GDP_Per_Capita_Value_Writer
+    -> GDP_Per_Capita_Range_Selector
+    -> GDP_Per_Capita_TableInterpreter
+    -> GDP_Data_Loader;
+
+  block Excel_Interpreter oftype XLSXInterpreter { }
+
+  block Bond_Issuance_Sheet_Selector oftype SheetPicker {
+   
+    sheetName: "Figure S5.1.2";
+  }
+
+  
+
+  block Bond_Issuance_Range_Selector oftype CellRangeSelector {
+    
+    select: range P2:S45;
+  }
+block GDP_Per_Capita_Sheet_Selector oftype SheetPicker {
+   
+    sheetName: "Figure S5.1.2";
+  }
+
+  block GDP_Per_Capita_Range_Selector oftype CellRangeSelector {
+   
+    select: range P2:S45;
+  }
+
+  
+
+  block Bond_Issuance_Value_Writer oftype CellWriter {
+    
+    at: cell S2;
+    write: ["Bond Issuance Share"];
+  }
+block BondIssuance_Country_CodeWriter oftype CellWriter {
+   
+    at: cell P2;
+    write: ["Country Code"];
+  }
+
+  block GDP_Per_Capita_Country_Code_Writer oftype CellWriter {
+    
+    at: cell P2;
+    write: ["Country Code"];
+  }
+
+  block GDP_Per_Capita_Value_Writer oftype CellWriter {
+    
+    at: cell R2;
+    write: ["GDP per Capita"];
+  }
+
+  block Bond_Issuance_TableInterpreter oftype TableInterpreter {
+    
+    header: true;
+    columns: [
+      "Country Code" oftype CountryCode,
+      "Bond Issuance Share" oftype BondIssuanceShare
+    ];
+  }
+
+  block GDP_Per_Capita_TableInterpreter oftype TableInterpreter {
+   
+    header: true;
+    columns: [
+      "Country Code" oftype CountryCode,
+      "GDP per Capita" oftype GdpPerCapita
+    ];
+  }
+
+  block Bond_Data_Loader oftype SQLiteLoader {
+
+    table: "bondIssuance";
+    file: "./country-stats.sqlite";
+  }
+
+  block GDP_Data_Loader oftype SQLiteLoader {
+    table: "gdpPerCapita";
+    file: "./country-stats.sqlite";
+  }
+
+  valuetype CountryCode oftype text {
+    constraints: [ CountryCodeFormat ];
+  }
+
+  constraint CountryCodeFormat oftype RegexConstraint {
+    regex: /^[A-Z]{3}$/;
+  }
+
+  valuetype BondIssuanceShare oftype decimal {
+    constraints: [ ValidBondIssuanceRange ];
+  }
+
+  constraint ValidBondIssuanceRange oftype RangeConstraint {
+    lowerBound: 0;
+    upperBound: 1;
+    lowerBoundInclusive: true;
+    upperBoundInclusive: true;
+  }
+
+  valuetype GdpPerCapita oftype decimal {
+    constraints: [ ValidGDPRange ];
+  }
+
+  constraint ValidGDPRange oftype RangeConstraint {
+    lowerBound: 0;
+    lowerBoundInclusive: true;
+  }
+
+  
+}
