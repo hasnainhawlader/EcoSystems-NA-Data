@@ -25,7 +25,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Run the tests
+# Run our tests
 echo "Running test cases..."
 pytest ./project/test.py
 
